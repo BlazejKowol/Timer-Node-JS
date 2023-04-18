@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 const App = () => {
 
     const [status, setStatus] = useState('off');
-    const [time, setTime] = useState(null);
+    const [time, setTime] = useState(0);
     const [timer, setTimer] = useState(null);
 
     const formatTime = (duration) => {
@@ -14,7 +14,7 @@ const App = () => {
         let minutes = Math.floor(duration / 60);
         let seconds = duration % 60;
 
-      return minutes + ":" + seconds; 
+      return minutes + ":" + seconds.toString().padStart(2, '0'); 
     }
 
     const startTimer = () => {
@@ -22,22 +22,23 @@ const App = () => {
       setStatus('work');
       setTimer(
         setInterval(() => {
-        setTime(time => time - 1);
-        useEffect(() => {
-        if(time === 0) {
-          playBell();
-          if(status === 'work') {
-            setStatus('rest');
-            setTime(20);
-          } 
-          if(status === 'rest') {
-            setStatus('work');
-            setTime(1200);
-          }
-        }
-      }, [time]);
-      }));
+          setTime(time => time - 1);
+        }, 1000));
     }
+
+    useEffect(() => {
+      if(time === 0) {
+        if(status === 'work') {
+          setStatus('rest');
+          playBell();
+          setTime(20);
+        } else if(status === 'rest') {
+          setStatus('work');
+          playBell();
+          setTime(1200);
+        }
+      }
+    }, [time]);
 
     const stopTimer = () => {
       clearInterval(timer);
